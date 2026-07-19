@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="λ-SPEC Resilience Lab measures system-environment coupling, fragility, and early decoupling signals.">
+  <title>λ-SPEC Resilience Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-a" aria-hidden="true"></div>
+  <div class="ambient ambient-b" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="λ-SPEC home"><span class="brand-mark">λ</span><span><strong>SPEC</strong><small>Resilience Lab</small></span></a>
+    <nav class="top-actions" aria-label="Primary"><button id="languageButton" class="button ghost compact" type="button">ES</button><a class="button ghost compact" href="https://github.com/SamySalamy87x/lambda-spec" target="_blank" rel="noreferrer">GitHub ↗</a></nav>
+  </header>
+  <main id="top">
+    <section class="hero shell">
+      <div class="eyebrow"><span class="pulse"></span><span data-i18n="eyebrow">Operational resilience, measured</span></div>
+      <h1 data-i18n="heroTitle">See what remains when the environment is withdrawn.</h1>
+      <p class="hero-copy" data-i18n="heroCopy">λ-SPEC turns a table into an auditable coupling profile: global fragility, rolling trajectory, environmental-driver ranking, and a controlled withdrawal stress test.</p>
+      <div class="hero-pills" aria-label="Product capabilities"><span>λ coupling</span><span>Φ fragility</span><span>dλ/dt early signal</span><span>Evidence-first AI</span></div>
+      <div class="formula-card" aria-label="Lambda-SPEC formula"><span class="formula">Φ(x) = lim<sub>λ→0</sub> ‖H<sub>local</sub>(x)‖ / ‖H(x,E)‖</span><span data-i18n="formulaNote">Fragility is not only inside the object. It is revealed by the coupling it loses.</span></div>
+    </section>
+    <section class="workspace shell" aria-label="Analysis workspace">
+      <aside class="panel setup-panel">
+        <div class="section-heading"><span class="step-number">01</span><div><h2 data-i18n="dataHeading">Choose the evidence</h2><p data-i18n="dataSubheading">Load a demo or upload a CSV. Data stays in this running instance.</p></div></div>
+        <label class="field-label" for="demoSelect" data-i18n="demoLabel">Demonstration dataset</label>
+        <div class="field-row"><select id="demoSelect"><option value="degradation">Network support withdrawal</option><option value="telemetry">Orbital telemetry</option><option value="supply-chain">Supply-chain resilience</option><option value="isolated">Isolated-system control</option></select><button id="loadDemoButton" class="button secondary" type="button" data-i18n="loadDemo">Load demo</button></div>
+        <div class="divider"><span data-i18n="or">or</span></div>
+        <label id="uploadZone" class="upload-zone" for="csvInput"><input id="csvInput" type="file" accept=".csv,text/csv" hidden><span class="upload-icon">↥</span><strong data-i18n="uploadTitle">Upload a CSV</strong><small data-i18n="uploadNote">Header row required · up to 5 MB</small></label>
+        <div class="dataset-meta" id="datasetMeta" aria-live="polite"></div>
+        <div class="field-grid two"><label><span data-i18n="titleLabel">Analysis title</span><input id="titleInput" type="text" maxlength="100"></label><label><span data-i18n="methodLabel">Coupling method</span><select id="methodSelect"><option value="spearman">Spearman</option><option value="pearson">Pearson</option><option value="residual">Residual</option></select></label></div>
+        <label class="field-label" for="windowInput"><span data-i18n="windowLabel">Rolling window</span> <output id="windowOutput"></output></label><input id="windowInput" type="range" min="3" max="100" value="30">
+        <div class="section-heading compact-heading"><span class="step-number">02</span><div><h2 data-i18n="mapHeading">Map the system</h2><p data-i18n="mapSubheading">Assign each numeric column to the system, its environment, or ignore it.</p></div></div>
+        <div class="role-legend" aria-label="Column roles"><span><i class="dot system"></i><span data-i18n="systemRole">System</span></span><span><i class="dot environment"></i><span data-i18n="environmentRole">Environment</span></span><span><i class="dot ignored"></i><span data-i18n="ignoreRole">Ignore</span></span></div>
+        <div id="columnMapper" class="column-mapper"></div>
+        <button id="analyzeButton" class="button primary full" type="button"><span data-i18n="analyzeButton">Run resilience analysis</span><span aria-hidden="true">→</span></button><div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
+      </aside>
+      <section class="results-column">
+        <div id="emptyState" class="panel empty-state"><div class="empty-orbit"><span>λ</span></div><h2 data-i18n="emptyTitle">Your resilience profile will appear here.</h2><p data-i18n="emptyCopy">The loaded demo is ready. Run the analysis to produce evidence, stress curves, and an exportable report.</p></div>
+        <div id="results" class="results hidden">
+          <section class="panel result-header"><div><div class="eyebrow"><span class="pulse"></span><span data-i18n="analysisComplete">Analysis complete</span></div><h2 id="resultTitle">—</h2><p id="resultContext">—</p></div><div class="export-actions"><button id="downloadJsonButton" class="button ghost compact" type="button">JSON</button><button id="downloadMarkdownButton" class="button ghost compact" type="button">Markdown</button><button id="printButton" class="button ghost compact" type="button" data-i18n="printButton">Print / PDF</button></div></section>
+          <section class="metrics-grid" aria-label="Key metrics"><article class="metric-card"><span>λ</span><strong id="lambdaMetric">—</strong><small data-i18n="lambdaMetric">Observed coupling</small></article><article class="metric-card"><span>Φ</span><strong id="phiMetric">—</strong><small data-i18n="phiMetric">Fragility under withdrawal</small></article><article class="metric-card"><span>dλ/dt</span><strong id="slopeMetric">—</strong><small id="trendMetric">—</small></article><article class="metric-card"><span data-i18n="stateMetric">State</span><strong id="stateMetric">—</strong><small id="confidenceMetric">—</small></article></section>
+          <section class="panel decision-panel"><div class="section-heading inline-heading"><span class="step-number">03</span><div><h2 data-i18n="decisionHeading">Decision snapshot</h2><p data-i18n="decisionSubheading">What the measurements support—and what they do not.</p></div></div><h3 id="headlineText">—</h3><div class="evidence-grid"><div><h4 data-i18n="evidenceHeading">Evidence</h4><ul id="evidenceList"></ul></div><div><h4 data-i18n="limitsHeading">Limits</h4><ul id="limitsList"></ul></div></div></section>
+          <section class="chart-grid"><article class="panel chart-panel"><div class="chart-heading"><div><h3 data-i18n="trajectoryHeading">Coupling trajectory</h3><p data-i18n="trajectoryCopy">Rolling λ and Φ reveal whether the system is strengthening or decoupling.</p></div><span class="chart-key"><i class="lambda-line"></i>λ <i class="phi-line"></i>Φ</span></div><canvas id="trajectoryChart" height="280" aria-label="Rolling lambda and phi chart"></canvas></article><article class="panel chart-panel"><div class="chart-heading"><div><h3 data-i18n="stressHeading">Environmental withdrawal</h3><p data-i18n="stressCopy">A controlled signal-removal test estimates the resilience envelope.</p></div><span class="chart-key"><i class="lambda-line"></i>λ</span></div><canvas id="stressChart" height="280" aria-label="Environmental withdrawal chart"></canvas></article></section>
+          <section class="panel driver-panel"><div class="chart-heading"><div><h3 data-i18n="driversHeading">Measured environmental drivers</h3><p data-i18n="driversCopy">Ranked by the loss of λ when each variable is removed.</p></div></div><div id="driversList" class="drivers-list"></div></section>
+          <section class="panel interpreter-panel"><div class="interpreter-copy"><span class="ai-badge">GPT / evidence mode</span><h3 data-i18n="interpreterHeading">Ask the evidence interpreter</h3><p data-i18n="interpreterCopy">When an OpenAI key is configured, the app uses the selected model. Without one, it returns a deterministic evidence summary so the product never breaks.</p><textarea id="questionInput" rows="3" data-i18n-placeholder="questionPlaceholder" placeholder="What should I investigate next?"></textarea><button id="explainButton" class="button secondary" type="button" data-i18n="explainButton">Interpret the evidence</button></div><div class="narrative-box"><div class="narrative-meta"><span data-i18n="interpretationLabel">Interpretation</span><small id="engineLabel">—</small></div><div id="narrativeText" class="narrative-text" data-i18n="narrativeEmpty">Run the interpreter after the analysis.</div></div></section>
+        </div>
+      </section>
+    </section>
+    <section class="method shell"><div class="method-intro"><span class="eyebrow" data-i18n="methodEyebrow">How it works</span><h2 data-i18n="methodTitle">A narrow, auditable chain from data to decision.</h2></div><div class="method-steps"><article><span>1</span><h3 data-i18n="method1Title">Measure</h3><p data-i18n="method1Copy">Estimate λ from the relationship between system and environment variables.</p></article><article><span>2</span><h3 data-i18n="method2Title">Track</h3><p data-i18n="method2Copy">Calculate rolling λ and dλ/dt to expose strengthening or decoupling.</p></article><article><span>3</span><h3 data-i18n="method3Title">Stress</h3><p data-i18n="method3Copy">Withdraw environmental signal progressively and observe the resilience envelope.</p></article><article><span>4</span><h3 data-i18n="method4Title">Explain</h3><p data-i18n="method4Copy">Generate an evidence-bounded interpretation and export the underlying metrics.</p></article></div></section>
+  </main>
+  <footer class="footer shell"><div><strong>λ-SPEC v1.2</strong><span>Omar Rafael Pérez Gallardo · OMROS LAB · Querétaro</span></div><p data-i18n="footerNote">Research software. Coupling is association, not causal proof or certification.</p></footer>
+  <script src="analysis.js" defer></script><script src="app.js" defer></script>
+</body>
+</html>
