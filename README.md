@@ -1,115 +1,186 @@
-# λ-SPEC v1.1
+<p align="center">
+  <strong style="font-size: 2rem">λ-SPEC Resilience Lab</strong><br>
+  <em>See what remains when the environment is withdrawn.</em>
+</p>
 
-**Fragilidad como límite del acoplamiento.**
+<p align="center">
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#what-the-product-does">Product</a> ·
+  <a href="#scientific-core">Scientific core</a> ·
+  <a href="HACKATHON_SUBMISSION.md">Build Week submission</a>
+</p>
 
-```
-Φ(x) = lim   ‖H_local(x)‖ / ‖H(x, E)‖
-      λ→0
-```
+# λ-SPEC v1.2
 
-- `Φ → 1` — el objeto es todo lo que hay. **Frágil**, aunque sea excelente.
-- `Φ → 0` — el objeto es un nodo. **Robusto**, aunque sea mediocre.
+λ-SPEC is an executable method and product for measuring **system–environment coupling**. It estimates whether a system remains robust because it is well coupled to its environment, or becomes fragile when that support is withdrawn.
 
----
+The Resilience Lab converts a CSV into an auditable decision package:
 
-## La tesis
+- global coupling `λ` and complementary fragility `Φ = 1 − λ`;
+- rolling coupling and `dλ/dt` as an early decoupling signal;
+- an environmental-withdrawal stress envelope;
+- drop-one ranking of measured environmental drivers;
+- explicit data-quality, confidence, evidence, and limitation sections;
+- JSON, Markdown, and print/PDF exports;
+- an optional OpenAI Responses API interpretation constrained to the measured evidence.
 
-La fragilidad no es propiedad del objeto. Es propiedad del acoplamiento.
+The application is **static-first**: every core analysis can run locally in the browser, including CSV upload. The Python server provides the reference implementation and can add the optional OpenAI interpretation. No third-party frontend framework or charting dependency is required.
 
-Los índices de fragilidad existentes miden el objeto: cuántos eventos tumban un RCT, qué tan quebrado está un Estado. Un número, una foto. λ-SPEC mide otra cosa — qué queda cuando el entorno se retira.
+## Quick start
 
-**Corolario.** El sustrato causal no aporta información: es obvio y es causa de sí mismo. Por lo tanto Φ es medible *solo* removiendo el acoplamiento, nunca inspeccionando el objeto.
+### Browser-only mode
 
-**Condición de existencia.** `dλ/dt > 0`. Si λ deja de crecer, Φ→1 y el sistema colapsa a su propio H_local. Aplica al hígado, a la telemetría, al portafolio — y a λ-SPEC mismo. Autorreferencial por construcción: no es defecto, es la prueba.
+Open `lambda_spec/static/index.html`, or publish that directory as a static site. The browser computes the analysis locally and includes four demonstrations.
 
----
-
-## Instalación
+### Python product mode
 
 ```bash
-pip install -e .
-python examples/quickstart.py
+python -m pip install -e .
+lambda-spec-lab --open-browser
 ```
 
-Cinco minutos. Datos sintéticos incluidos. Cero dependencias externas más allá de numpy y scipy.
+Then open `http://127.0.0.1:8000`.
 
----
+Alternative:
 
-## Uso
-
-```python
-from lambda_spec import coupling, synthetic
-
-x, env = synthetic.bistable_switch()
-r = coupling(x, env)
-
-print(r)          # CouplingResult(lambda=0.9462, phi=0.0538, n=200, ROBUSTO)
-print(r.fragile)  # False
+```bash
+python -m lambda_spec.webapp --host 0.0.0.0 --port 8000
 ```
 
-Condición de existencia sobre una serie temporal:
+### Docker
 
-```python
-from lambda_spec import dlambda_dt
-
-dlambda_dt([0.20, 0.31, 0.44, 0.55, 0.68])   # +0.1200  estable
-dlambda_dt([0.68, 0.55, 0.44, 0.31, 0.20])   # -0.1200  COLAPSO EN CURSO
+```bash
+docker build -t lambda-spec .
+docker run --rm -p 8000:8000 lambda-spec
 ```
 
----
+### Optional evidence interpreter
 
-## API
+The product remains fully functional without an API key. To enable the OpenAI-backed interpretation, provide the key to the server environment and optionally choose the model:
 
-| Función | Devuelve |
+```bash
+export OPENAI_API_KEY="..."
+export OPENAI_MODEL="gpt-5.6"
+lambda-spec-lab
+```
+
+The model receives a compact metric snapshot, not the entire raw dataset. Its instruction prohibits causal, clinical, certification, or guaranteed-prediction claims. If the request fails, the app returns a deterministic local interpretation.
+
+## What the product does
+
+1. **Choose evidence** — load a built-in scenario or upload a CSV.
+2. **Map the system** — mark columns as system, environment, or ignored.
+3. **Measure** — calculate global `λ`, `Φ`, and state.
+4. **Track** — calculate rolling `λ` and `dλ/dt`.
+5. **Stress** — progressively replace environmental signal with independently permuted observations and measure the monotone resilience envelope.
+6. **Rank** — remove one environmental variable at a time and measure the loss of `λ`.
+7. **Explain and export** — create an evidence-bounded interpretation and download the auditable metrics.
+
+Built-in demonstrations:
+
+| Demo | Purpose |
 |---|---|
-| `coupling(x, env, method=)` | `CouplingResult` — λ, Φ, H_local, H_total |
-| `phi(x, env)` | `float` — solo Φ |
-| `dlambda_dt(serie, t=None)` | `float` — pendiente. Negativa = colapso |
-| `fragility_report(x, env, name)` | `str` — reporte legible |
+| Network support withdrawal | Shows progressive decoupling and a weakening `dλ/dt` |
+| Orbital telemetry | Multi-subsystem operational coupling |
+| Supply-chain resilience | Demand, supplier, and transport dependence |
+| Isolated-system control | Negative control expected to produce high `Φ` |
 
-**Métodos:** `spearman` (default, monotónico, robusto a no-linealidad) · `pearson` (lineal) · `residual` (varianza explicada vía mínimos cuadrados)
+## Scientific core
 
----
-
-## Validación
-
-Salida real de `quickstart.py`:
-
-| Dominio | λ | Φ | Estado |
-|---|---|---|---|
-| OXPHOS hepático (bistable) | 0.946 | 0.054 | ROBUSTO |
-| BCI neural (N=24) | 0.587 | 0.413 | ROBUSTO |
-| Telemetría: subsistemas | 0.472 | 0.528 | FRÁGIL |
-| Sistema aislado (control) | 0.082 | **0.918** | FRÁGIL |
-
-El control negativo separa limpiamente: un sistema sin acoplamiento da Φ=0.918 aunque su estructura interna sea perfectamente coherente. Eso es la tesis, medida.
-
-```bash
-python -m pytest tests/ -q
-# 8 passed
+```text
+Φ(x) = lim        ‖H_local(x)‖
+       λ → 0      ─────────────
+                  ‖H(x, E)‖
 ```
 
----
+- `Φ → 1`: the object is mostly its isolated dynamics — fragile under withdrawal.
+- `Φ → 0`: the object behaves as a coupled node — robust under the measured environment.
+- Existence condition: `dλ/dt > 0`; a persistently negative trajectory is treated as a decoupling warning, not proof of inevitable collapse.
 
-## Alcance
+### Python API
 
-Esta es la implementación de referencia — mínima, ejecutable, verificable por un desconocido sin abrir un issue. No es el pipeline completo.
+```python
+from lambda_spec import analyze_resilience, markdown_report, synthetic
 
-Las validaciones empíricas (OXPHOS r=0.983 en 4/5 datasets NASA OSDR · Samy-Link N=24 LOSO · ORION-HEALTH ρ=0.94 · ORION OPS 2.59M muestras) viven en sus repos respectivos. Aquí sólo está el formalismo y su prueba sintética.
+x, env = synthetic.telemetry_subsystems(n=240)
+result = analyze_resilience(
+    x,
+    env,
+    system_names=["power", "thermal", "comms"],
+    environment_names=["orbital_cycle", "solar_phase"],
+    window=48,
+    title="Orbital telemetry",
+)
 
----
+print(result["global"])
+print(markdown_report(result))
+```
 
-## Nomenclatura
+Low-level API:
 
-Antes: FI-SPEC v1.0 (DOI 10.5281/zenodo.20724294).
+| Function | Output |
+|---|---|
+| `coupling(x, env, method=)` | `CouplingResult`: λ, Φ, norms, sample count |
+| `phi(x, env)` | Φ only |
+| `dlambda_dt(series, t=None)` | λ slope |
+| `analyze_resilience(...)` | Complete JSON-serializable product analysis |
+| `markdown_report(result)` | Auditable Markdown report |
 
-Renombrado a λ-SPEC para eliminar la colisión con el *Fragility Index* clínico (Walsh et al., 2014) y el *Fragile States Index*. Ambos miden el objeto; λ-SPEC mide el acoplamiento. El nombre anterior enterraba la distinción en cada búsqueda.
+Methods:
 
----
+- `spearman` — monotonic association; default.
+- `pearson` — linear association.
+- `residual` — normalized residual energy after least-squares environmental reconstruction.
 
-## Licencia
+## Architecture
 
-MIT.
+```text
+CSV / demo
+    │
+    ├── browser-local engine (analysis.js)
+    │      └── static deployment, no server required
+    │
+    └── Python reference server (webapp.py)
+           ├── analysis.py → rolling, withdrawal, ranking, reports
+           ├── core.py → λ / Φ primitives
+           └── optional OpenAI Responses API interpretation
+```
 
-Omar Rafael Pérez Gallardo — OMROS LAB, Querétaro
-ORCID [0009-0008-8328-6978](https://orcid.org/0009-0008-8328-6978)
+The browser and Python implementations use the same narrow analysis chain. The Python path is the canonical reference; the browser path preserves a zero-dependency public demo and keeps uploaded data local.
+
+## Validation
+
+```bash
+python -m pip install -e ".[test]"
+pytest -q
+node tests/js_smoke.js
+```
+
+Current test surface:
+
+- original λ/Φ mathematical invariants and controls;
+- method directionality;
+- rolling and withdrawal behavior;
+- data-quality and overlap validation;
+- Markdown audit sections;
+- live HTTP health, demo, analysis, and interpretation fallback;
+- static-browser engine smoke test.
+
+## Scope and limitations
+
+λ-SPEC measures observed coupling. It does **not** by itself establish causality, clinical diagnosis, financial suitability, engineering certification, or a guaranteed forecast. Results depend on the variables and time range supplied. The withdrawal curve is a controlled stress-test envelope, not a literal simulation of every real intervention.
+
+The implementation is intentionally transparent and compact so a reviewer can inspect the computation without a proprietary service.
+
+## Original reference implementation
+
+Earlier λ-SPEC v1.1 validated the minimal formalism with synthetic controls and exposed `coupling`, `phi`, `dlambda_dt`, and `fragility_report`. Version 1.2 preserves that API and adds the complete Resilience Lab product layer.
+
+Previous name: FI-SPEC v1.0, renamed to avoid collision with established clinical and state fragility indices.
+
+## License and author
+
+MIT License.
+
+Omar Rafael Pérez Gallardo — OMROS LAB, Querétaro, Mexico  
+ORCID: `0009-0008-8328-6978`

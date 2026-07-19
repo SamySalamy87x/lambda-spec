@@ -4,16 +4,29 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lambda-spec"
-version = "1.1.0"
-description = "Fragilidad como limite del acoplamiento"
+version = "1.2.0"
+description = "Measure system-environment coupling, fragility, and early decoupling signals"
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = "MIT"
 authors = [{name = "Omar Rafael Perez Gallardo", email = "digitaldr.qro@gmail.com"}]
 dependencies = ["numpy>=1.20", "scipy>=1.7"]
+keywords = ["resilience", "fragility", "coupling", "systems", "risk", "telemetry"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
 
 [project.optional-dependencies]
 test = ["pytest>=7.0"]
+ai = ["openai>=1.0"]
+
+[project.scripts]
+lambda-spec-lab = "lambda_spec.webapp:main"
 
 [tool.setuptools.packages.find]
 include = ["lambda_spec*"]
+
+[tool.setuptools.package-data]
+lambda_spec = ["static/*.html", "static/*.css", "static/*.js"]
