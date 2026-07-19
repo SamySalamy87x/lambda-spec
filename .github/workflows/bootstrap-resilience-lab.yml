@@ -1,0 +1,31 @@
+name: Bootstrap Resilience Lab
+
+on:
+  push:
+    branches: [build-week-resilience-lab]
+    paths:
+      - ".github/bootstrap_payload.part*"
+      - ".github/bootstrap_resilience_lab.py"
+      - ".github/workflows/bootstrap-resilience-lab.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: build-week-resilience-lab
+          fetch-depth: 0
+      - name: Materialize product files
+        run: python .github/bootstrap_resilience_lab.py
+      - name: Commit product layer
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "feat: ship lambda-SPEC Resilience Lab v1.2"
+          git push origin HEAD:build-week-resilience-lab
