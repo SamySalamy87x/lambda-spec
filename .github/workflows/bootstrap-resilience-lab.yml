@@ -7,12 +7,16 @@ on:
       - ".github/bootstrap_payload.part*"
       - ".github/bootstrap_resilience_lab.py"
       - ".github/workflows/bootstrap-resilience-lab.yml"
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
 
 jobs:
   materialize:
+    if: github.head_ref == 'build-week-resilience-lab' || github.ref_name == 'build-week-resilience-lab'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
